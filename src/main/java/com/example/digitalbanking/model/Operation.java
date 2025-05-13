@@ -1,5 +1,6 @@
 package com.example.digitalbanking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,5 +25,6 @@ public class Operation {
     private OperationType operationType;
 
     @ManyToOne()
+    @JsonIgnoreProperties({"customer", "operations"})
     private BankAccount bankAccount;
 }

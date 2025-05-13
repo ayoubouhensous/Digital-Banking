@@ -2,11 +2,12 @@ package com.example.digitalbanking.mapper;
 
 import com.example.digitalbanking.dtos.BankAccountDTO;
 import com.example.digitalbanking.dtos.CustomerDTO;
-import com.example.digitalbanking.model.BankAccount;
-import com.example.digitalbanking.model.CurrentAccount;
-import com.example.digitalbanking.model.Customer;
-import com.example.digitalbanking.model.SavingAccount;
+import com.example.digitalbanking.dtos.OperationDTO;
+import com.example.digitalbanking.model.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BankAccountMapper {
@@ -30,6 +31,7 @@ public class BankAccountMapper {
         if (bankAccount == null) return null;
         BankAccountDTO dto = new BankAccountDTO();
         dto.setId(bankAccount.getId());
+
         if (bankAccount instanceof SavingAccount) {
             dto.setAccountType("SAVING");
             dto.setInterestRate(((SavingAccount) bankAccount).getInterestRate());
@@ -39,11 +41,24 @@ public class BankAccountMapper {
         } else {
             dto.setAccountType("UNKNOWN");
         }
+
         dto.setBalance(bankAccount.getBalance());
         dto.setCreatedAt(bankAccount.getCreatedAt());
         dto.setCustomer(fromCustomer(bankAccount.getCustomer()));
+
+        // ✅ Convertir les opérations en DTO
+        if (bankAccount.getOperations() != null) {
+            dto.setOperations(
+                    bankAccount.getOperations()
+                            .stream()
+                            .map(this::fromOperation)
+                            .collect(Collectors.toList())
+            );
+        }
+
         return dto;
     }
+
 
     public BankAccount fromBankAccountDTO(BankAccountDTO dto) {
         if (dto == null) return null;
@@ -62,6 +77,15 @@ public class BankAccountMapper {
         account.setCreatedAt(dto.getCreatedAt());
         account.setCustomer(fromCustomerDTO(dto.getCustomer()));
         return account;
+    }
+    public OperationDTO fromOperation(Operation operation) {
+        if (operation == null) return null;
+        OperationDTO dto = new OperationDTO();
+        dto.setId(operation.getId());
+        dto.setDate(operation.getDate());
+        dto.setAmount(operation.getAmount());
+        dto.setOperationType(operation.getOperationType());
+        return dto;
     }
 
 }

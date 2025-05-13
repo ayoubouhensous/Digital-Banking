@@ -2,8 +2,12 @@ package com.example.digitalbanking.service;
 
 import com.example.digitalbanking.model.BankAccount;
 import com.example.digitalbanking.model.Customer;
+import com.example.digitalbanking.model.Operation;
 import com.example.digitalbanking.repository.BankAccountRepository;
 import com.example.digitalbanking.repository.CustomerRepository;
+import com.example.digitalbanking.repository.OperationRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +18,12 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountRepository bankAccountRepository;
     private final CustomerRepository customerRepository;
+    private final OperationRepository operationRepository;
 
-    public BankAccountServiceImpl(BankAccountRepository bankAccountRepository, CustomerRepository customerRepository) {
+    public BankAccountServiceImpl(BankAccountRepository bankAccountRepository, CustomerRepository customerRepository, OperationRepository operationRepository) {
         this.bankAccountRepository = bankAccountRepository;
         this.customerRepository = customerRepository;
+        this.operationRepository = operationRepository;
     }
 
     @Override
@@ -65,5 +71,16 @@ public class BankAccountServiceImpl implements BankAccountService {
             throw new RuntimeException("Bank account not found with ID: " + accountId);
         }
         bankAccountRepository.deleteById(accountId);
+    }
+    @Override
+    public List<BankAccount> getPaginatedAccounts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bankAccountRepository.findAll(pageable).getContent();
+    }
+    @Override
+    public List<Operation> getAccountHistory(Long accountId) {
+        BankAccount account = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        return operationRepository.findByBankAccountId(accountId);
     }
 }

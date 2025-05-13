@@ -1,5 +1,6 @@
 package com.example.digitalbanking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +25,9 @@ public class BankAccount {
     private AccountStatus status;
 
     @ManyToOne()
+    @JsonIgnoreProperties("bankAccounts") // ignore la liste de comptes dans le client
     private Customer customer;
 
-    @OneToMany(mappedBy = "bankAccount")
+    @OneToMany(mappedBy = "bankAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Operation> operations;
 }
