@@ -7,14 +7,13 @@
     import com.example.digitalbanking.model.BankAccount;
     import com.example.digitalbanking.model.Customer;
     import com.example.digitalbanking.service.BankAccountService;
-    import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
 
     import java.util.List;
     import java.util.stream.Collectors;
 
     @RestController
-
+    @CrossOrigin("*")
     public class BankAccountController {
         private BankAccountService bankAccountService;
         private BankAccountMapper bankAccountMapper;
@@ -25,15 +24,20 @@
         }
 
         @PostMapping("/customers")
-        @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
         public CustomerDTO createCustomer(@RequestBody CustomerDTO customerDTO) {
             Customer customer = bankAccountMapper.fromCustomerDTO(customerDTO);
             Customer saved = bankAccountService.saveCustomer(customer);
             return bankAccountMapper.fromCustomer(saved);
         }
+        @GetMapping("/customers/search")
+        public List<CustomerDTO> searchCustomer(@RequestParam(name ="search" , defaultValue = "") String search) {
+
+            return bankAccountService.getCustomersByname(search).stream()
+                    .map(bankAccountMapper::fromCustomer)
+                    .collect(Collectors.toList());
+        }
 
         @GetMapping("/customers")
-        @PreAuthorize("hasAnyAuthority('SCOPE_USER')")
         public List<CustomerDTO> getAllCustomers() {
             return bankAccountService.listCustomers().stream()
                     .map(bankAccountMapper::fromCustomer)
@@ -41,7 +45,6 @@
         }
 
         @GetMapping("/accounts")
-        @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
         public List<BankAccountDTO> getAccounts(
                 @RequestParam(defaultValue = "0") int page,
                 @RequestParam(defaultValue = "5") int size) {

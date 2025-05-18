@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf->csrf.disable())
                 .authorizeHttpRequests(ar->ar.requestMatchers("/auth/login/**").permitAll())
-                .authorizeHttpRequests(ar->ar.anyRequest().authenticated())
+                .authorizeHttpRequests(ar->ar.anyRequest().permitAll())
                 .oauth2ResourceServer(oa->oa.jwt(Customizer.withDefaults()))
                 .build();
     }
@@ -78,4 +78,5 @@ public class SecurityConfig {
 
         return new ProviderManager(daoAuthenticationProvider);
     }
+
 }

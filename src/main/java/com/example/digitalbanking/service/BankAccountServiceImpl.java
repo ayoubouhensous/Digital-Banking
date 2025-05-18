@@ -83,4 +83,9 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         return operationRepository.findByBankAccountId(accountId);
     }
+
+    @Override
+    public List<Customer> getCustomersByname(String name) {
+        return customerRepository.findByNameContains(name);
+    }
 }

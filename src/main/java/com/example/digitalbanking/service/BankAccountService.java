@@ -16,6 +16,7 @@ public interface BankAccountService {
     void deleteBankAccount(Long accountId);
     List<BankAccount> getPaginatedAccounts(int page, int size);
     List<Operation> getAccountHistory(Long accountId);
+    List<Customer> getCustomersByname(String name);
 
 
 }
