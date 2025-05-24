@@ -7,6 +7,7 @@
     import com.example.digitalbanking.model.BankAccount;
     import com.example.digitalbanking.model.Customer;
     import com.example.digitalbanking.service.BankAccountService;
+    import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
 
     import java.util.List;
@@ -24,17 +25,20 @@
         }
 
         @PostMapping("/customers")
+        @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
         public CustomerDTO createCustomer(@RequestBody CustomerDTO customerDTO) {
             Customer customer = bankAccountMapper.fromCustomerDTO(customerDTO);
             Customer saved = bankAccountService.saveCustomer(customer);
             return bankAccountMapper.fromCustomer(saved);
         }
         @GetMapping("/customers/search")
+        @PreAuthorize("hasAuthority('SCOPE_USER')")
         public List<CustomerDTO> searchCustomer(@RequestParam(name ="search" , defaultValue = "") String search) {
 
             return bankAccountService.getCustomersByname(search).stream()
                     .map(bankAccountMapper::fromCustomer)
                     .collect(Collectors.toList());
+
         }
 
         @GetMapping("/customers")
@@ -74,6 +78,7 @@
         }
 
         @DeleteMapping("/accounts/{id}")
+        @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
         public void deleteAccount(@PathVariable Long id) {
             bankAccountService.deleteBankAccount(id);
         }

@@ -24,9 +24,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -54,6 +58,7 @@ public class SecurityConfig {
         return http
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf->csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(ar->ar.requestMatchers("/auth/login/**").permitAll())
                 .authorizeHttpRequests(ar->ar.anyRequest().permitAll())
                 .oauth2ResourceServer(oa->oa.jwt(Customizer.withDefaults()))
@@ -77,6 +82,18 @@ public class SecurityConfig {
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
 
         return new ProviderManager(daoAuthenticationProvider);
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*");           // Autorise toutes les origines
+        corsConfiguration.addAllowedMethod("*");           // Autorise toutes les méthodes HTTP (GET, POST, PUT, etc.)
+        corsConfiguration.addAllowedHeader("*");           // Autorise tous les en-têtes HTTP
+        /// corsConfiguration.setExposedHeaders(List.of("x-auth-token")); // Autorise l'exposition du header "x-auth-token" dans la réponse
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration); // Applique la configuration à toutes les routes
+        return source;
     }
 
 }
