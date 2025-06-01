@@ -95,4 +95,11 @@
                     })
                     .collect(Collectors.toList());
         }
+
+        @DeleteMapping("/customers/{id}")
+        @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+        public void deleteCustomer(@PathVariable Long id) {
+            bankAccountService.deleteCustomers(id);
+        }
+
     }

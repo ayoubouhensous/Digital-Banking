@@ -88,4 +88,9 @@ public class BankAccountServiceImpl implements BankAccountService {
     public List<Customer> getCustomersByname(String name) {
         return customerRepository.findByNameContains(name);
     }
+
+    @Override
+    public void deleteCustomers(Long customerId) {
+        customerRepository.deleteById(customerId);
+    }
 }
